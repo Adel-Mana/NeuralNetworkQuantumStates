@@ -4,38 +4,104 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 
-def make_subtitle(meta):
-    # Ligne 1 : Infos système
-    graph = meta.get("graph", "?")
-    L = meta.get("L", "?")
-    dim = meta.get("n_dim", "?")
-    pbc = "PBC" if meta.get("pbc", False) else "OBC"
-    model = meta.get("model", "?")
+def make_subtitle(meta, meta_key=None):
+    """
+    Construit un sous-titre lisible à partir du meta fourni :
+    - enlève meta_key s'il existe
+    - enlève tous les champs dont la valeur est "?"
+    """
 
-    line1 = f"Model: {model} | Graph: {graph} (L={L}, dim={dim}, {pbc})"
+    m = dict(meta)  # copie
+    if meta_key in m:
+        m.pop(meta_key)
 
-    # Ligne 2 : Hamiltonien + sampler + optimiser
-    H = meta.get("hamiltonian", {})
-    H_type = H.get("type", "?")
-    H_J = H.get("J", "?")
-    H_h = H.get("h", "?")
+    # ---------- LIGNE 1 ----------
+    parts1 = []
 
-    sampler = meta.get("sampler", {})
-    samp_type = sampler.get("type", "?")
-    n_chains = sampler.get("n_chains", "?")
-    n_samples = sampler.get("n_samples", "?")
+    # Model
+    model = m.get("model")
+    if model not in (None, "?"):
+        parts1.append(f"Model: {model}")
 
-    optim = meta.get("optimizer", {})
-    opt_type = optim.get("type", "?")
-    lr = optim.get("lr", "?")
+    # Graph
+    graph = m.get("graph")
+    if graph not in (None, "?"):
+        parts1.append(f"Graph: {graph}")
 
-    line2 = (
-        f"{H_type}: J={H_J}, h={H_h} | "
-        f"Sampler: {samp_type} ({n_chains}×{n_samples}) | "
-        f"Optim: {opt_type} (lr={lr})"
-    )
+    # L
+    L = m.get("L")
+    if L not in (None, "?"):
+        parts1.append(f"L={L}")
+
+    # dim
+    dim = m.get("n_dim")
+    if dim not in (None, "?"):
+        parts1.append(f"dim={dim}")
+
+    # pbc
+    pbc = m.get("pbc")
+    if isinstance(pbc, bool):
+        parts1.append("PBC" if pbc else "OBC")
+
+    line1 = " | ".join(parts1)
+
+    # ---------- LIGNE 2 ----------
+    parts2 = []
+
+    # Hamiltonien
+    H = m.get("hamiltonian", {})
+    H_type = H.get("type")
+    H_J = H.get("J")
+    H_h = H.get("h")
+
+    if H_type not in (None, "?"):
+        txt = H_type
+        items = []
+        if H_J not in (None, "?"):
+            items.append(f"J={H_J}")
+        if H_h not in (None, "?"):
+            items.append(f"h={H_h}")
+        if items:
+            txt += " (" + ", ".join(items) + ")"
+        parts2.append(txt)
+
+    # Sampler
+    sampler = m.get("sampler", {})
+    samp_type = sampler.get("type")
+    n_chains = sampler.get("n_chains")
+    n_samples = sampler.get("n_samples")
+
+    if samp_type not in (None, "?"):
+        txt = samp_type
+        if n_chains not in (None, "?") and n_samples not in (None, "?"):
+            txt += f" ({n_chains}×{n_samples})"
+        parts2.append("Sampler: " + txt)
+
+    # Optimizer
+    opt = m.get("optimizer", {})
+    opt_type = opt.get("type")
+    lr = opt.get("lr")
+    diag_shift = opt.get("diag_shift")
+
+    if opt_type not in (None, "?"):
+        txt = opt_type
+        items = []
+        if lr not in (None, "?"):
+            items.append(f"lr={lr}")
+        if diag_shift not in (None, "?"):
+            items.append(f"diag={diag_shift}")
+        if items:
+            txt += " (" + ", ".join(items) + ")"
+        parts2.append("Optim: " + txt)
+
+    line2 = " | ".join(parts2)
 
     return line1 + "\n" + line2
+
+
+# ----------------------------------------------------------
+# Fonction principale intelligente de plot
+# ----------------------------------------------------------
 
 
 def plot_energy_from_run(run_dir):
@@ -72,3 +138,8 @@ def plot_energy_from_run(run_dir):
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+
+plot_energy_from_run(
+    r"C:\Users\mouts\OneDrive\Bureau\X\2A\PSC\NQS\logs\run_2025-12-03_13-32-36"
+)

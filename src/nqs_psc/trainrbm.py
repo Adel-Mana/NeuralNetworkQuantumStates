@@ -6,7 +6,8 @@ import numpy as np
 L = 3
 a1 = np.array([1.0, 0.0])
 a2 = np.array([0.0, 1.0])
-
+J = 1
+H = 3
 # Définition de l'hamiltonien
 g = nk.graph.Hypercube(length=L, n_dim=2, pbc=True)
 hi = nk.hilbert.Spin(s=1 / 2, N=g.n_nodes)
@@ -22,21 +23,23 @@ psi_gs = psi_gs.reshape(-1)
 print(e_gs)
 
 # ---- Seul changement ici ----
-model = nk.models.RBM(alpha=1)
+alpha = 3
+model = nk.models.RBM(alpha=alpha, param_dtype=complex)
 # -----------------------------
 
 sampler = nk.sampler.MetropolisLocal(hi, n_chains=300)
 vstate = nk.vqs.MCState(sampler, model, n_samples=1000)
 
 # Optimisation
-optimizer = nk.optimizer.Sgd(learning_rate=0.01)
-gs = nk.driver.VMC(ham, optimizer, variational_state=vstate)
+lr = 0.05
+optimizer = nk.optimizer.Sgd(learning_rate=lr)
+gs = nk.driver.VMC_SR(ham, optimizer, variational_state=vstate, diag_shift=1e-1)
 
 # création du logger
 log = nk.logging.RuntimeLog()
 
 # One or more logger objects must be passed to the keyword argument `out`.
-# gs.run(n_iter=300, out=log)
+gs.run(n_iter=300, out=log)
 
 # meta identique
 meta = {
@@ -45,10 +48,12 @@ meta = {
     "n_dim": 2,
     "pbc": True,
     "hamiltonian": {"type": "Heisenberg"},
-    "model": "RBM(alpha=1)",
+    "model": "RBM",
+    "alpha": alpha,
     "sampler": {"type": "MetropolisLocal", "n_chains": 300, "n_samples": 1000},
-    "optimizer": {"type": "SGD", "lr": 0.01},
+    "optimizer": {"type": "SGD", "lr": 0.01, "diag_shift": "?"},
     "n_iter": 300,
+    "exact": e_gs,
 }
 
 run_dir = save_run(log, meta)

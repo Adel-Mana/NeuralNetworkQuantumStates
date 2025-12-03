@@ -4,11 +4,14 @@
   "n_dim": 2,
   "pbc": true,
   "hamiltonian": {
-    "type": "Ising",
-    "h": 3,
-    "J": 1
+    "type": "Heisenberg"
   },
-  "model": "GCNN",
+  "model": "CNN",
+  "kernel_size": 1,
+  "channels": [
+    16,
+    16
+  ],
   "sampler": {
     "type": "MetropolisLocal",
     "n_chains": 300,
@@ -16,7 +19,7 @@
   },
   "optimizer": {
     "type": "SGD",
-    "lr": 0.01
+    "lr": 0.02
   },
   "n_iter": 300
 }

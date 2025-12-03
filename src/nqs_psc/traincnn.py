@@ -19,7 +19,7 @@ lattice = nk.graph.Lattice(basis_vectors=[a1, a2], extent=(3, 3), pbc=True)
 
 
 # Création de l'état variationnel
-t = (16, 16)
+t = (5, 5)
 model = ans.CNN(
     lattice=lattice, kernel_size=((2, 2), (2, 2)), channels=t, param_dtype=complex
 )
@@ -29,7 +29,7 @@ vstate = nk.vqs.MCState(sampler, model, n_samples=1000, seed=12345)
 # Optimisation
 lr = 0.01
 op = nk.optimizer.Sgd(learning_rate=lr)
-gs = nk.driver.VMC(ham, op, variational_state=vstate)
+gs = nk.driver.VMC_SR(ham, op, variational_state=vstate, diag_shift=1e-3)
 
 
 # création du logger

@@ -93,7 +93,7 @@ class CNN(nn.Module):
         for i, (c, k) in enumerate(zip(self.channels, self.kernels)):
             x = nn.Conv(
                 features=c,
-                kernel_size=3,
+                kernel_size=k,
                 padding="CIRCULAR",
                 param_dtype=self.param_dtype,
                 kernel_init=nn.initializers.xavier_normal(),
