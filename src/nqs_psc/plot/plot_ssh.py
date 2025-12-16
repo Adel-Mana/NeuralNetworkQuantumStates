@@ -137,11 +137,12 @@ def plot_energy_from_run(run_dir):
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.show()
+    
+    plt.savefig(run_dir / "energy_plot.png", dpi=200)
+    print(f"Graphique sauvegardé dans {run_dir / 'energy_plot.png'}")
+
 
 
 plot_energy_from_run(
     r"/users/eleves-a/2024/rami.chagnaud/Documents/NeuralNetworkQuantumStates/logs/run_2025-12-13_18-20-08"
 )
-
-
