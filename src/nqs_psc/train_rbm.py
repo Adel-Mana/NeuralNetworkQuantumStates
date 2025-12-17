@@ -38,10 +38,10 @@ operator_list = [nk.operator.spin.sigmaz(hi, i) for i in range(g.n_nodes)]
 
 from scipy.sparse.linalg import eigsh
 
-e_gs, psi_gs = eigsh(ham.to_sparse(), k=2, which="SA")
-e_gs = e_gs[0]
-psi_gs = psi_gs.reshape(-1)
-print(e_gs)
+#e_gs, psi_gs = eigsh(ham.to_sparse(), k=2, which="SA")
+#e_gs = e_gs[0]
+#psi_gs = psi_gs.reshape(-1)
+#print(e_gs)
 
 # ---- Seul changement ici ----
 alpha = 3
